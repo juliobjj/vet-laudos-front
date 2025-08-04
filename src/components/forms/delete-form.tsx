@@ -8,22 +8,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { DialogFooter } from "../ui/dialog";
+import { useDeleteUser } from "@/hooks/use-users";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  cardId: z.string(),
+  userId: z.number(),
 });
 
 export default function DeleteForm({
-  cardId,
+  userId,
   setIsOpen,
 }: {
-  cardId: string;
+  userId: number;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
+  const deleteUser = useDeleteUser();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      cardId: cardId,
+      userId: userId,
     },
   });
 
@@ -31,6 +36,8 @@ export default function DeleteForm({
 
   const onSubmit = async () => {
     try {
+      await deleteUser.mutateAsync(userId);
+      toast.success("Usuário deletado com sucesso!");
       setIsOpen(false);
     } catch (error) {
       console.log(error);
@@ -43,12 +50,12 @@ export default function DeleteForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6  sm:px-0 px-4"
       >
-        <div className="w-full flex justify-center sm:space-x-6">
+        <DialogFooter className="flex justify-end gap-2">
           <Button
             size="lg"
             variant="outline"
             disabled={isLoading}
-            className="w-full hidden sm:block"
+            className="hidden sm:block"
             type="button"
             onClick={() => setIsOpen(false)}
           >
@@ -58,7 +65,7 @@ export default function DeleteForm({
             size="lg"
             type="submit"
             disabled={isLoading}
-            className="w-full bg-red-500 hover:bg-red-400"
+            className=" bg-red-500 hover:bg-red-400"
           >
             {isLoading ? (
               <>
@@ -69,7 +76,7 @@ export default function DeleteForm({
               <span>Delete</span>
             )}
           </Button>
-        </div>
+        </DialogFooter>
       </form>
     </Form>
   );
