@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import DeleteForm from "@/components/forms/delete-form";
-import EditForm from "@/components/forms/edit-forms";
+import UserForm from "@/components/forms/user-forms";
 import IconMenu from "@/components/menu-icon";
 import { ResponsiveDialog } from "@/components/responsive.dialog";
 import { Button } from "@/components/ui/button";
@@ -20,12 +20,12 @@ import { User } from "../_interface/user";
 
 interface DataTableRowActionsProps {
   row: Row<User>;
-  reloadUsers?: () => void;
+  onEditUser?: (user: User) => void;
 }
 
 export function DataTableRowActions({
   row,
-  reloadUsers,
+  onEditUser,
 }: DataTableRowActionsProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -33,6 +33,14 @@ export function DataTableRowActions({
   const userId = row.original.id as number;
   const userName = row.original.name;
   const user = row.original;
+
+  const handleEditClick = () => {
+    if (onEditUser) {
+      onEditUser(user);
+    } else {
+      setIsEditOpen(true);
+    }
+  };
 
   return (
     <>
@@ -42,11 +50,7 @@ export function DataTableRowActions({
         setIsOpen={setIsEditOpen}
         title="Editar Usuário"
       >
-        <EditForm
-          user={user}
-          setIsOpen={setIsEditOpen}
-          onUpdated={reloadUsers}
-        />
+        <UserForm user={user} setIsOpen={setIsEditOpen} />
       </ResponsiveDialog>
 
       {/* Dialog/Drawer para deletar */}
@@ -70,7 +74,7 @@ export function DataTableRowActions({
         <DropdownMenuContent align="end" className="w-[160px] z-50">
           <DropdownMenuItem className="p-0">
             <button
-              onClick={() => setIsEditOpen(true)}
+              onClick={handleEditClick}
               className="w-full flex items-center rounded-md p-2 text-sm text-neutral-500 hover:bg-neutral-100"
             >
               <IconMenu

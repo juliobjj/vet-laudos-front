@@ -2,6 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api"; // seu axios configurado
 import { User } from "@/components/datatable/_interface/user";
 
+// Tipo para criação de usuário (sem password obrigatório)
+type CreateUserData = Omit<User, "id" | "password"> & {
+  password: string;
+};
+
 export function useUsers() {
   return useQuery<User[]>({
     queryKey: ["users"],
@@ -12,24 +17,52 @@ export function useUsers() {
   });
 }
 
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newUser: CreateUserData) => {
+      const { data } = await api.post("/users", newUser);
+      return data;
+    },
+    onSuccess: () => {
+      // Invalida a query para buscar os dados atualizados
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error: unknown) => {
+      // Tratamento específico para erros de validação
+      const axiosError = error as {
+        response?: { status: number; data?: { message?: string } };
+      };
+      if (axiosError.response?.status === 400) {
+        const errorMessage = axiosError.response.data?.message;
+
+        if (errorMessage?.includes("CPF")) {
+          console.log("errorMessage");
+          throw new Error("CPF já cadastrado no sistema.");
+        } else if (errorMessage?.includes("email")) {
+          throw new Error("E-mail já cadastrado no sistema.");
+        } else {
+          throw new Error(errorMessage || "Erro ao criar usuário.");
+        }
+      }
+      throw new Error("Erro ao criar usuário. Tente novamente.");
+    },
+  });
+}
+
 export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (updatedUser: { id: number; user: Partial<User> }) => {
-      console.log("Executando mutação para usuário:", updatedUser.id);
       const { data } = await api.put(
         `/users/${updatedUser.id}`,
         updatedUser.user
       );
-      console.log("Resposta da mutação:", data);
       return data;
     },
     onMutate: async (updatedUser) => {
-      console.log(
-        "Iniciando atualização otimista para usuário:",
-        updatedUser.id
-      );
       // Cancelar queries em andamento
       await queryClient.cancelQueries({ queryKey: ["users"] });
 
@@ -38,25 +71,37 @@ export function useUpdateUser() {
 
       // Atualização otimista
       queryClient.setQueryData<User[]>(["users"], (old) => {
-        const updated = old?.map((user) =>
+        return old?.map((user) =>
           user.id === updatedUser.id ? { ...user, ...updatedUser.user } : user
         );
-        console.log("Cache atualizado otimisticamente:", updated);
-        return updated;
       });
 
       // Retorna o contexto com o valor anterior
       return { previousUsers };
     },
-    onError: (err, updatedUser, context) => {
-      console.error("Erro na mutação:", err);
+    onError: (err: unknown, updatedUser, context) => {
       // Em caso de erro, reverte para o valor anterior
       if (context?.previousUsers) {
         queryClient.setQueryData(["users"], context.previousUsers);
       }
+
+      // Tratamento específico para erros de validação
+      const axiosError = err as {
+        response?: { status: number; data?: { message?: string } };
+      };
+      if (axiosError.response?.status === 400) {
+        const errorMessage = axiosError.response.data?.message;
+        if (errorMessage?.includes("CPF")) {
+          throw new Error("CPF já cadastrado no sistema.");
+        } else if (errorMessage?.includes("email")) {
+          throw new Error("E-mail já cadastrado no sistema.");
+        } else {
+          throw new Error(errorMessage || "Erro ao atualizar usuário.");
+        }
+      }
+      throw new Error("Erro ao atualizar usuário. Tente novamente.");
     },
     onSettled: () => {
-      console.log("Finalizando mutação - invalidando queries");
       // Sempre revalida após a mutação
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },

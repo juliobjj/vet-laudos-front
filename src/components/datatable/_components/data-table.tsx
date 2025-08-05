@@ -12,6 +12,7 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
   VisibilityState,
+  CellContext,
 } from "@tanstack/react-table";
 
 import {
@@ -26,13 +27,15 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { columns } from "../_components/columns";
 import { User } from "../_interface/user";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 interface Props {
   users: User[];
   isLoading: boolean;
+  onEditUser?: (user: User) => void;
 }
 
-export function DataTable({ users, isLoading }: Props) {
+export function DataTable({ users, isLoading, onEditUser }: Props) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "id", desc: false },
   ]);
@@ -40,9 +43,24 @@ export function DataTable({ users, isLoading }: Props) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  // Criar colunas dinamicamente para incluir a função onEditUser
+  const tableColumns = React.useMemo(() => {
+    return columns.map((col) => {
+      if (col.id === "actions") {
+        return {
+          ...col,
+          cell: (props: CellContext<User, unknown>) => (
+            <DataTableRowActions row={props.row} onEditUser={onEditUser} />
+          ),
+        };
+      }
+      return col;
+    });
+  }, [onEditUser]);
+
   const table = useReactTable({
     data: users,
-    columns,
+    columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -97,7 +115,7 @@ export function DataTable({ users, isLoading }: Props) {
               // Exibe spinner quando está carregando
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={tableColumns.length}
                   className="h-24 text-center"
                 >
                   <div className="flex items-center justify-center w-full h-full min-h-[200px]">
@@ -126,7 +144,7 @@ export function DataTable({ users, isLoading }: Props) {
               // Exibe mensagem quando não há dados
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={tableColumns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
                   Nenhum registro encontrado

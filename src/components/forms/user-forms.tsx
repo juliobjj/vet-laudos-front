@@ -6,11 +6,14 @@ import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { z } from "zod";
-import { User } from "../datatable/_interface/user";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { userFormSchema } from "@/lib/schemas/user.schema";
+import {
+  userFormSchema,
+  userCreateSchema,
+  UserFormValues,
+  UserCreateFormValues,
+} from "@/lib/schemas/user.schema";
 import {
   Form,
   FormControl,
@@ -32,31 +35,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useUpdateUser } from "@/hooks/use-users";
+import { useUpdateUser, useCreateUser } from "@/hooks/use-users";
+import { User } from "../datatable/_interface/user";
 
-type FormValues = z.infer<typeof userFormSchema>;
-
-export default function EditForm({
-  user,
-  setIsOpen,
-}: {
-  user?: User;
+interface UserFormProps {
+  user?: User; // Se user for undefined, é modo cadastro
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   onUpdated?: () => void;
-}) {
+}
+
+export default function UserForm({
+  user,
+  setIsOpen,
+  onUpdated,
+}: UserFormProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isEditMode = !!user;
   const updateUser = useUpdateUser();
+  const createUser = useCreateUser();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(userFormSchema),
+  // Escolhe o schema baseado no modo
+  const schema = isEditMode ? userFormSchema : userCreateSchema;
+
+  const form = useForm({
+    resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
       password: "",
+      ...(isEditMode ? {} : { confirmPassword: "" }),
       cpf: user?.cpf ? formatCPF(user.cpf) : "",
       phone: user?.phone ? formatPhone(user.phone) : "",
       dateBirth: user?.dateBirth || "",
@@ -71,6 +82,7 @@ export default function EditForm({
         name: user.name || "",
         email: user.email || "",
         password: "",
+        ...(isEditMode ? {} : { confirmPassword: "" }),
         cpf: user.cpf ? formatCPF(user.cpf) : "",
         phone: user.phone ? formatPhone(user.phone) : "",
         dateBirth: user.dateBirth || "",
@@ -78,33 +90,40 @@ export default function EditForm({
       setDate(parseDate(user.dateBirth));
       form.trigger();
     }
-  }, [user, form]);
+  }, [user, form, isEditMode]);
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: UserFormValues | UserCreateFormValues) => {
     setIsSubmitting(true);
     try {
       const payload = {
         ...values,
-        password: values.password || undefined,
+        password: values.password,
         cpf: unmaskCPF(values.cpf),
         dateBirth: unmaskDateToISO(date),
         phone: unmaskPhone(values.phone),
       };
 
-      console.log("Enviando payload:", payload);
-      console.log("ID do usuário:", user?.id);
+      if (isEditMode) {
+        await updateUser.mutateAsync({
+          id: user?.id as number,
+          user: payload,
+        });
+        toast.success(`Dados de ${values.name} atualizados com sucesso!`);
+      } else {
+        // Para criação, garante que password seja string
+        const createData = {
+          ...payload,
+          password: payload.password || "",
+        };
+        await createUser.mutateAsync(createData);
+        toast.success(`Usuário ${values.name} criado com sucesso!`);
+      }
 
-      const result = await updateUser.mutateAsync({
-        id: user?.id as number,
-        user: payload,
-      });
-      console.log("Resposta da API:", result);
-
-      toast.success(`Dados de ${values.name} atualizados com sucesso!`);
+      if (onUpdated) onUpdated();
       setIsOpen(false);
     } catch (error) {
-      console.error("Erro ao atualizar usuário:", error);
-      toast.error("Erro ao atualizar os dados do usuário.");
+      console.error("Erro ao processar usuário:", error);
+      toast.error(`${error}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -153,24 +172,65 @@ export default function EditForm({
         />
 
         {/* Senha */}
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nova Senha</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Digite uma senha válida"
-                  type="password"
-                  value={field.value || ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {isEditMode ? (
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nova Senha</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Digite uma nova senha (opcional)"
+                    type="password"
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Digite uma senha válida"
+                      type="password"
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirmar Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Confirme sua senha"
+                      type="password"
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
 
         {/* Telefone */}
         <FormField
@@ -181,7 +241,7 @@ export default function EditForm({
               <FormLabel>Telefone</FormLabel>
               <FormControl>
                 <Input
-                  autoComplete="phone"
+                  autoComplete="tel"
                   {...field}
                   value={field.value || ""}
                   onChange={(e) => field.onChange(formatPhone(e.target.value))}
@@ -267,7 +327,7 @@ export default function EditForm({
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : null}
-          Salvar
+          {isEditMode ? "Atualizar" : "Cadastrar"}
         </Button>
       </form>
     </Form>

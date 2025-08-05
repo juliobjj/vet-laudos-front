@@ -11,6 +11,7 @@ import {
   LogOut,
   Package,
   PanelBottom,
+  PawPrint,
   Settings2,
   ShoppingBag,
   Users,
@@ -57,11 +58,11 @@ export function Sidebar() {
                   href="/config"
                   prefetch={false}
                 >
-                  <ShoppingBag className="w-4 h-4 transition-all" />
-                  <span className="sr-only">Pedidos</span>
+                  <PawPrint className="w-4 h-4 transition-all" />
+                  <span className="sr-only">Pets</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Pedidos</TooltipContent>
+              <TooltipContent side="right">Pets</TooltipContent>
             </Tooltip>
 
             <Tooltip>
