@@ -86,6 +86,63 @@ export const parseDate = (dateStr?: string) => {
   return new Date(year, month - 1, day);
 };
 
+// Função para formatar RG
+export const formatRG = (rg: string) => {
+  const onlyNumbers = rg.replace(/\D/g, "").slice(0, 9);
+  return onlyNumbers
+    .replace(/(\d{2})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1})$/, "$1-$2");
+};
+
+// Função para formatar CEP
+export const formatCEP = (cep: string) => {
+  const onlyNumbers = cep.replace(/\D/g, "").slice(0, 8);
+  return onlyNumbers.replace(/(\d{5})(\d)/, "$1-$2");
+};
+
+// Função para detectar se é CPF ou RG e formatar adequadamente
+export const formatCPFOrRG = (value: string) => {
+  const onlyNumbers = value.replace(/\D/g, "");
+  
+  // Se tem 11 dígitos, trata como CPF
+  if (onlyNumbers.length <= 11) {
+    return formatCPF(value);
+  }
+  // Se tem mais de 11 dígitos, trata como RG
+  else {
+    return formatRG(value);
+  }
+};
+
+// Validação de RG (formato básico)
+export const validRG = (rg: string): boolean => {
+  const onlyNumbers = rg.replace(/\D/g, "");
+  // RG deve ter entre 7 e 9 dígitos
+  return onlyNumbers.length >= 7 && onlyNumbers.length <= 9;
+};
+
+// Validação de CPF ou RG
+export const validCPFOrRG = (value: string): boolean => {
+  const onlyNumbers = value.replace(/\D/g, "");
+  
+  // Se tem 11 dígitos, valida como CPF
+  if (onlyNumbers.length === 11) {
+    return validCPF(value);
+  }
+  // Se tem entre 7 e 9 dígitos, valida como RG
+  else if (onlyNumbers.length >= 7 && onlyNumbers.length <= 9) {
+    return validRG(value);
+  }
+  
+  return false;
+};
+
+// Função para aceitar apenas números
+export const onlyNumbers = (value: string) => value.replace(/\D/g, "");
+
 export const unmaskCPF = (value: string) => value.replace(/\D/g, ""); // remove tudo que não for número
 export const unmaskDate = (value: string) => value.replace(/\D/g, ""); // remove barras
 export const unmaskPhone = (value: string) => value.replace(/\D/g, "");
+export const unmaskCEP = (value: string) => value.replace(/\D/g, ""); // remove traço do CEP
+export const unmaskRG = (value: string) => value.replace(/\D/g, ""); // remove pontos e traço do RG

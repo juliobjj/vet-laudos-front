@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import {
+  ClipboardPlus,
   Home,
   LogOut,
   Package,
@@ -55,14 +56,14 @@ export function Sidebar() {
                 <Link
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
                   text-muted-foreground transition-colors hover:text-foreground"
-                  href="/config"
+                  href="/patients"
                   prefetch={false}
                 >
                   <PawPrint className="w-4 h-4 transition-all" />
-                  <span className="sr-only">Pets</span>
+                  <span className="sr-only">Pacientes</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Pets</TooltipContent>
+              <TooltipContent side="right">Pacientes</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -88,11 +89,11 @@ export function Sidebar() {
                   href="#"
                   prefetch={false}
                 >
-                  <Users className="w-4 h-4 transition-all" />
-                  <span className="sr-only">Clientes</span>
+                  <ClipboardPlus className="w-4 h-4 transition-all" />
+                  <span className="sr-only">Exames</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Clientes</TooltipContent>
+              <TooltipContent side="right">Exames</TooltipContent>
             </Tooltip>
 
             <Tooltip>
