@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api"; // seu axios configurado
-import { User } from "@/components/datatable/_interface/user";
+import { User } from "@/components/datatable/interfaces/user";
 
 // Tipo para criação de usuário (sem password obrigatório)
 type CreateUserData = Omit<User, "id" | "password"> & {

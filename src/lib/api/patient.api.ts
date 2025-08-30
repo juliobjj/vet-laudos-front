@@ -1,6 +1,6 @@
 import { api } from "@/services/api";
 import { PatientFormValues } from "@/lib/schemas/patient.schema";
-import { Patient } from "@/components/datatable/_interface/patient";
+import { Patient } from "@/components/datatable/interfaces/patient";
 
 export const patientApi = {
   // Buscar todos os pacientes

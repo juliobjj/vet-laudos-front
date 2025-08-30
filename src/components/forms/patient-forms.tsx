@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { 
   patientFormSchema, 
@@ -51,7 +48,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useUpdatePatient, useCreatePatient } from "@/hooks/use-patients";
-import { Patient } from "@/components/datatable/_interface/patient";
+import { Patient } from "@/components/datatable/interfaces/patient";
 
 interface PatientFormProps {
   patient?: Patient; // Se patient for undefined, é modo cadastro

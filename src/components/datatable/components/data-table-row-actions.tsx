@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Row } from "@tanstack/react-table";
 import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
-import { User } from "../_interface/user";
+import { User } from "../interfaces/user";
 
 interface DataTableRowActionsProps {
   row: Row<User>;

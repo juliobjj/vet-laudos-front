@@ -138,6 +138,29 @@ export const validCPFOrRG = (value: string): boolean => {
   return false;
 };
 
+// Função para calcular idade
+export const calculateAge = (birthDate: string): number | string => {
+  try {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    
+    // Usar UTC para evitar problemas de fuso horário
+    const birthUTC = new Date(birth.getUTCFullYear(), birth.getUTCMonth(), birth.getUTCDate());
+    const todayUTC = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+    
+    let age = todayUTC.getFullYear() - birthUTC.getFullYear();
+    const monthDiff = todayUTC.getMonth() - birthUTC.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && todayUTC.getDate() < birthUTC.getDate())) {
+      age--;
+    }
+    
+    return age;
+  } catch {
+    return 'N/A';
+  }
+};
+
 // Função para aceitar apenas números
 export const onlyNumbers = (value: string) => value.replace(/\D/g, "");
 

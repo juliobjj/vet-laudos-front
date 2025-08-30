@@ -2,7 +2,7 @@
 
 import { formatCPF, formatPhone } from "@/utils/format";
 import { ColumnDef } from "@tanstack/react-table";
-import { User } from "../_interface/user";
+import { User } from "../interfaces/user";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 

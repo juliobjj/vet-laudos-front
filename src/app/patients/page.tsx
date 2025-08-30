@@ -7,8 +7,8 @@ import { ResponsiveDialog } from "@/components/responsive.dialog";
 import PatientForm from "@/components/forms/patient-forms";
 import { Plus } from "lucide-react";
 import { usePatients } from "@/hooks/use-patients";
-import { Patient } from "@/components/datatable/_interface/patient";
-import { PatientDataTable } from "@/components/datatable/_components/patient-data-table";
+import { Patient } from "@/components/datatable/interfaces/patient";
+import { PatientTable } from "@/components/datatable/patient-table";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function PatientsPage() {
@@ -16,6 +16,7 @@ export default function PatientsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | undefined>(undefined);
+
   
   const { data: patients = [], isLoading } = usePatients();
 
@@ -33,10 +34,19 @@ export default function PatientsPage() {
     setIsEditOpen(true);
   };
 
+  const handleDeletePatient = (patient: Patient) => {
+    console.log('Excluir paciente:', patient);
+    reloadPatients();
+  };
+
+  const handleViewPatient = (patient: Patient) => {
+    console.log('Visualizar paciente:', patient);
+  };
+
 
 
   return (
-    <div className="p-8">
+    <div>
       <PageHeader
         title="Pacientes"
         description="Gerencie os pacientes cadastrados no sistema."
@@ -45,7 +55,7 @@ export default function PatientsPage() {
             onClick={handleCreatePatient}
             className="ml-auto bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition px-4 py-2"
           >
-            <Plus className="w-4 h-4 mr-2" /> Novo Pet
+            <Plus />
           </Button>
         }
       />
@@ -76,10 +86,12 @@ export default function PatientsPage() {
         />
       </ResponsiveDialog>
 
-      <PatientDataTable
-        patients={patients ?? []}
+      <PatientTable
+        patients={patients}
         isLoading={isLoading}
-        onEditPatient={handleEditPatient}
+        onEdit={handleEditPatient}
+        onDelete={handleDeletePatient}
+        onView={handleViewPatient}
       />
      </div>
    );

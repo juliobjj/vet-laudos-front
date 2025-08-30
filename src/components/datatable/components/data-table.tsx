@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { columns } from "../_components/columns";
-import { User } from "../_interface/user";
+import { columns } from "./columns";
+import { User } from "../interfaces/user";
 import { DataTableRowActions } from "./data-table-row-actions";
 
 interface Props {
@@ -79,18 +79,6 @@ export function DataTable({ users, isLoading, onEditUser }: Props) {
 
   return (
     <div>
-      {/* Filtro */}
-      <div className="flex items-center py-4 justify-between">
-        <Input
-          placeholder="Buscar por nome..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
-
       {/* Tabela */}
       <div className="overflow-hidden rounded-md border">
         <Table>

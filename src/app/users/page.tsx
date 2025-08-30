@@ -1,7 +1,7 @@
 "use client";
 import { PageHeader } from "@/components/ui/page-header";
-import { User } from "@/components/datatable/_interface/user";
-import { DataTable } from "@/components/datatable/_components/data-table";
+import { User } from "@/components/datatable/interfaces/user";
+import { DataTable } from "@/components/datatable/components/data-table";
 import { useQueryClient } from "@tanstack/react-query";
 import { ResponsiveDialog } from "@/components/responsive.dialog";
 import UserForm from "@/components/forms/user-forms";
@@ -33,7 +33,7 @@ export default function DataTablePage() {
   };
 
   return (
-    <div className="p-8">
+    <div>
       <PageHeader
         title="Usuários"
         description="Gerencie os usuários cadastrados no sistema."

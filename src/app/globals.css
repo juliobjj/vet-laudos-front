@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-roboto);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -46,7 +46,7 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: #5C5C5C;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -56,7 +56,7 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: #7c7c7c;
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -116,7 +116,30 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-size: 12px;
+    /* Tamanho base da fonte aumentado */
+  }
+
+  /* Configuração de tamanhos de fonte responsivos */
+  html {
+    font-size: 12px;
+    /* Base para rem calculations */
+  }
+
+  @media (max-width: 768px) {
+    html {
+      font-size: 12px;
+      /* Menor em dispositivos móveis */
+    }
+  }
+
+  @media (min-width: 1200px) {
+    html {
+      font-size: 12px;
+      /* Maior em telas grandes */
+    }
   }
 }

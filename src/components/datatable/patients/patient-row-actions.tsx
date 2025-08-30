@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Row } from "@tanstack/react-table";
 import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
-import { Patient } from "../_interface/patient";
+import { Patient } from "../interfaces/patient";
 
 interface PatientDataTableRowActionsProps {
   row: Row<Patient>;
@@ -60,7 +60,7 @@ export function PatientDataTableRowActions({
         title="Deletar Paciente"
         description={`Tem certeza de que deseja excluir o paciente ${patientName}?`}
       >
-        <DeletePatientForm patientId={patientId} setIsOpen={setIsDeleteOpen} />
+        <DeletePatientForm patientId={patientId} patientName={patientName} setIsOpen={setIsDeleteOpen} />
       </ResponsiveDialog>
 
       {/* Menu de ações */}

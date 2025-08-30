@@ -36,7 +36,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useUpdateUser, useCreateUser } from "@/hooks/use-users";
-import { User } from "../datatable/_interface/user";
+import { User } from "../datatable/interfaces/user";
 
 interface UserFormProps {
   user?: User; // Se user for undefined, é modo cadastro

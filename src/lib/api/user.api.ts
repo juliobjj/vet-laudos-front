@@ -1,6 +1,6 @@
 import { api } from "@/services/api";
 import { UserFormValues } from "../schemas/user.schema";
-import { User } from "@/components/datatable/_interface/user";
+import { User } from "@/components/datatable/interfaces/user";
 
 export const UserService = {
   async getUsers() {
